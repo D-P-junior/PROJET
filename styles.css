@@ -450,7 +450,80 @@ footer {
     font-size: 0.875rem;
 }
 
-/* --- Global Adjustments --- */
+/* --- Simulated Phone --- */
+
+.simulated-phone {
+    position: fixed;
+    bottom: -500px;
+    right: 2rem;
+    width: 300px;
+    height: 500px;
+    background: #000;
+    border-radius: 32px 32px 0 0;
+    border: 8px solid #333;
+    z-index: 2000;
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.simulated-phone.active {
+    bottom: 0;
+}
+
+.phone-screen {
+    flex: 1;
+    background: #f1f5f9;
+    margin: 5px;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.phone-header {
+    height: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.sms-bubble {
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 18px 18px 18px 2px;
+    font-size: 0.875rem;
+    max-width: 85%;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+}
+
+.sms-time {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+/* --- Report View --- */
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.receipt-card {
+    border-left: 4px solid var(--primary);
+}
 
 @media (max-width: 767px) {
     .dashboard-grid {

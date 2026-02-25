@@ -145,6 +145,10 @@ const app = {
       this.renderDebts(mainView);
     } else if (this.state.currentView === 'clients') {
       this.renderClients(mainView);
+    } else if (this.state.currentView === 'reminders') {
+      this.renderReminders(mainView);
+    } else if (this.state.currentView === 'reports') {
+      this.renderReports(mainView);
     }
   },
 
@@ -261,6 +265,102 @@ const app = {
     });
   },
 
+  renderReports(container) {
+    const tpl = document.getElementById('tpl-reports').content.cloneNode(true);
+    container.innerHTML = '';
+    container.appendChild(tpl);
+
+    const totalMonth = this.state.payments.reduce((acc, p) => acc + p.amount, 0);
+    const totalCash = this.state.payments.filter(p => p.method === 'cash').reduce((acc, p) => acc + p.amount, 0);
+    const totalOnline = this.state.payments.filter(p => p.method === 'online').reduce((acc, p) => acc + p.amount, 0);
+
+    document.getElementById('report-total-month').innerText = `${totalMonth.toLocaleString()} FCFA`;
+    document.getElementById('report-total-cash').innerText = `${totalCash.toLocaleString()} FCFA`;
+    document.getElementById('report-total-online').innerText = `${totalOnline.toLocaleString()} FCFA`;
+
+    const tbody = document.getElementById('reports-table-body');
+    if (tbody) {
+      [...this.state.payments].reverse().forEach(p => {
+        const debt = this.state.debts.find(d => d.id === p.debtId);
+        const client = debt ? this.state.clients.find(c => c.id === debt.clientId) : null;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(p.date).toLocaleDateString()}</td>
+          <td style="font-weight: 500;">${client ? client.name : 'Client inconnu'}</td>
+          <td style="font-weight: 600;">${p.amount.toLocaleString()} FCFA</td>
+          <td><span class="badge ${p.method === 'cash' ? 'badge-success' : 'badge-info'}">${p.method === 'cash' ? 'Cash' : 'En ligne'}</span></td>
+          <td class="text-sm text-muted">${p.id}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  },
+
+  renderReminders(container) {
+    const tpl = document.getElementById('tpl-reminders').content.cloneNode(true);
+    container.innerHTML = '';
+    container.appendChild(tpl);
+
+    const tbody = document.getElementById('reminders-table-body');
+    const sendBtn = document.getElementById('btn-send-bulk');
+    const selectedSpan = document.getElementById('selected-count');
+    const selectAll = document.getElementById('select-all-reminders');
+
+    const overdueClients = this.state.clients.map(c => {
+      const debts = this.state.debts.filter(d => d.clientId === c.id && d.status !== 'Payé');
+      const totalOutstanding = debts.reduce((acc, d) => acc + d.amountRemaining, 0);
+      const hasOverdue = debts.some(d => d.status === 'En retard');
+      return { ...c, totalOutstanding, debtsCount: debts.length, hasOverdue };
+    }).filter(c => c.debtsCount > 0);
+
+    if (overdueClients.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;" class="text-muted">Aucun client n\'a de dette en cours pour le moment.</td></tr>';
+      return;
+    }
+
+    overdueClients.forEach(client => {
+      const tr = document.createElement('tr');
+      const statusBadge = client.hasOverdue
+        ? '<span class="badge badge-danger">En retard</span>'
+        : '<span class="badge badge-info">En cours</span>';
+
+      tr.innerHTML = `
+        <td><input type="checkbox" class="client-checkbox" data-id="${client.id}"></td>
+        <td style="font-weight: 500;">
+          <div>${client.name}</div>
+          <div class="text-muted" style="font-size: 0.75rem;">${client.phone}</div>
+        </td>
+        <td style="font-weight: 600; color: ${client.hasOverdue ? '#ef4444' : 'var(--text-main)'};">${client.totalOutstanding.toLocaleString()} FCFA</td>
+        <td class="text-sm text-muted">Jamais</td>
+        <td>${statusBadge} (${client.debtsCount})</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const updateSelection = () => {
+      const selected = document.querySelectorAll('.client-checkbox:checked').length;
+      selectedSpan.innerText = selected;
+      sendBtn.disabled = selected === 0;
+    };
+
+    tbody.onclick = (e) => {
+      if (e.target.classList.contains('client-checkbox')) {
+        updateSelection();
+      }
+    };
+
+    selectAll.onchange = () => {
+      document.querySelectorAll('.client-checkbox').forEach(cb => cb.checked = selectAll.checked);
+      updateSelection();
+    };
+
+    sendBtn.onclick = () => {
+      const count = document.querySelectorAll('.client-checkbox:checked').length;
+      alert(`Simulation : ${count} rappels SMS & WhatsApp ont été envoyés avec succès !`);
+      this.navigate('dashboard');
+    };
+  },
+
   renderClients(container) {
     container.innerHTML = `
       <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -373,20 +473,58 @@ const app = {
         this.state.clients.push(client);
       }
 
-      this.state.debts.push({
+      const newDebt = {
         id: Date.now() + 1,
         clientId: client.id,
         amountTotal: amount,
         amountRemaining: amount,
         dueDate: dueDate,
-        status: new Date(dueDate) < new Date() ? 'En retard' : 'En cours',
+        status: 'En attente', // Initial status before SMS confirmation
         createdAt: new Date().toISOString()
-      });
+      };
 
+      this.state.debts.push(newDebt);
       this.save();
       this.closeModal();
       this.render();
-      alert('Dette ajoutée avec succès !');
+
+      // Trigger SMS confirmation
+      this.simulateSmsConfirmation(newDebt);
+    };
+  },
+
+  simulateSmsConfirmation(debt) {
+    const phone = document.getElementById('client-phone');
+    const smsContainer = document.getElementById('sms-container');
+    const client = this.state.clients.find(c => c.id === debt.clientId);
+
+    smsContainer.innerHTML = `
+      <div class="sms-time">Maintenant</div>
+      <div class="sms-bubble">
+        <strong>LAMONDJAI</strong><br>
+        Bonjour ${client.name}, une nouvelle dette de ${debt.amountTotal.toLocaleString()} FCFA a été enregistrée à votre nom. Échéance: ${new Date(debt.dueDate).toLocaleDateString()}.<br><br>
+        <button class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.4rem;" id="sms-confirm-btn">Confirmer la réception</button>
+      </div>
+    `;
+
+    setTimeout(() => {
+      phone.classList.add('active');
+    }, 1000);
+
+    document.getElementById('sms-confirm-btn').onclick = () => {
+      debt.status = new Date(debt.dueDate) < new Date() ? 'En retard' : 'En cours';
+      this.save();
+      this.render();
+
+      smsContainer.innerHTML += `
+        <div class="sms-bubble" style="background: #2563eb; color: white; align-self: flex-end; border-radius: 18px 18px 2px 18px; margin-top: 0.5rem;">
+          J'ai bien reçu le message. Merci.
+        </div>
+      `;
+
+      setTimeout(() => {
+        phone.classList.remove('active');
+      }, 2000);
     };
   },
 
