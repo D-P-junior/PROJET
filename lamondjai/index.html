@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAMONDJAI | Gestion de Dettes Digitale</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons for modern feel -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Content will be injected here by app.js -->
+    </div>
+
+    <template id="tpl-auth">
+        <div class="auth-wrapper">
+            <div class="card auth-card glass-card">
+                <h2 id="auth-title" style="margin-bottom: 0.5rem; text-align: center;">LAMONDJAI</h2>
+                <p id="auth-subtitle" class="text-muted text-sm" style="margin-bottom: 2rem; text-align: center;">Gérez
+                    vos dettes en toute simplicité.</p>
+
+                <form id="auth-form">
+                    <div class="form-group" id="group-name" style="display: none;">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" id="auth-name" class="form-input" placeholder="Ex: Jean Dupont">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="auth-email" class="form-input" placeholder="nom@entreprise.com"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;"
+                        id="auth-submit">Se connecter</button>
+                </form>
+
+                <p class="text-sm text-muted" style="margin-top: 1.5rem; text-align: center;">
+                    <span id="auth-toggle-text">Pas encore de compte ?</span>
+                    <a href="#" id="auth-toggle-link"
+                        style="color: var(--primary); font-weight: 500; text-decoration: none; margin-left: 0.25rem;">S'inscrire</a>
+                </p>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-layout">
+        <div class="app-container">
+            <aside class="sidebar">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="padding-left: 0.5rem;">
+                        <h2 style="color: var(--primary); letter-spacing: -0.025em; font-size: 1.25rem;">LAMONDJAI</h2>
+                    </div>
+                </div>
+
+                <nav style="flex: 1;">
+                    <a href="#" class="nav-link active" data-view="dashboard">
+                        <i data-lucide="layout-dashboard"></i> Dashboard
+                    </a>
+                    <a href="#" class="nav-link" data-view="debts">
+                        <i data-lucide="list"></i> Liste des dettes
+                    </a>
+                    <a href="#" class="nav-link" data-view="clients">
+                        <i data-lucide="users"></i> Mes Clients
+                    </a>
+                </nav>
+
+                <div class="sidebar-user-footer"
+                    style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div
+                            style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; margin-right: 0.75rem;">
+                        </div>
+                        <div>
+                            <div class="text-sm" style="font-weight: 600;" id="user-display-name">Utilisateur</div>
+                            <div style="font-size: 0.75rem;" class="text-muted">Pro Plan</div>
+                        </div>
+                    </div>
+                    <a href="#" class="nav-link" id="btn-logout" style="color: #ef4444;">
+                        <i data-lucide="log-out"></i> Déconnexion
+                    </a>
+                </div>
+            </aside>
+
+            <main class="main-content" id="main-view">
+                <!-- Dashboard or Debt view will be injected here -->
+            </main>
+        </div>
+    </template>
+
+    <template id="tpl-dashboard">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1>Bienvenue, <span id="dash-user-name">Commerçant</span></h1>
+                <p class="text-muted">Voici l'état actuel de votre activité.</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-outline" onclick="app.navigate('debts')">
+                    <i data-lucide="search"></i> Recherche client
+                </button>
+                <button class="btn btn-primary" id="btn-add-debt-quick">
+                    <i data-lucide="plus"></i> Ajouter dette
+                </button>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="card stat-item">
+                <h4>Total dettes en cours</h4>
+                <div class="value" style="color: #ef4444;" id="stat-total-debts">0 FCFA</div>
+            </div>
+            <div class="card stat-item">
+                <h4>Total récupéré</h4>
+                <div class="value" style="color: var(--secondary);" id="stat-total-recovered">0 FCFA</div>
+            </div>
+            <div class="card stat-item">
+                <h4>Nombre de clients</h4>
+                <div class="value" id="stat-client-count">0</div>
+            </div>
+            <div class="card stat-item">
+                <h4>Clients à risque</h4>
+                <div class="value" style="color: #f59e0b;" id="stat-risk-clients">0</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <div class="card" style="min-width: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Dernières dettes</h3>
+                    <a href="#" style="font-size: 0.875rem; color: var(--primary); text-decoration: none;"
+                        onclick="app.navigate('debts')">Voir tout</a>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Montant</th>
+                                <th>Échéance</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-debts-list">
+                            <!-- JS will populate -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 1.5rem;">Actions rapides</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn btn-outline" style="justify-content: flex-start; width: 100%;"
+                        onclick="app.showModal('add-debt')">
+                        <i data-lucide="plus-circle" style="color: var(--primary);"></i> Enregistrer une dette
+                    </button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; width: 100%;">
+                        <i data-lucide="send" style="color: var(--secondary);"></i> Envoyer rappels groupés
+                        </a>
+                        <button class="btn btn-outline" style="justify-content: flex-start; width: 100%;">
+                            <i data-lucide="bar-chart-3" style="color: #8b5cf6;"></i> Rapport mensuel
+                        </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Modals -->
+    <div id="modal-container"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card glass-card" style="width: 100%; max-width: 500px; padding: 2rem; position: relative;"
+            id="modal-content">
+            <!-- Modal content injected here -->
+            <button onclick="app.closeModal()"
+                style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
