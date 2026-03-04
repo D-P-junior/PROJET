@@ -1,0 +1,35 @@
+* {
+    margin: 0px;
+    padding:  0px;
+}
+
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: wheat;
+
+}
+
+header p{
+    margin-left: 10px;
+    color: rgb(102, 26, 243);
+}
+
+.items{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.img{
+    padding: 20px;
+    
+}
+
+.img1{
+    border-radius: 25px;
+    width: 70px;
+    height: 70px;
+}

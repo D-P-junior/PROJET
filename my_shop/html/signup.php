@@ -1,12 +1,14 @@
 <?php
 session_start();
-try{
+require('data.php');
+$dbb = DNS::getInstance();
+/*try{
         $dbb = new PDO('mysql:host=localhost;dbname=my_shop', 'root', 'root');
         $dbb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     } catch (PDOException $e){
         echo $e->getMessage();
-    }
+    }*/
 $erreurs = [];
 if ($_SERVER['REQUEST_METHOD'] ==='POST'){
     $name = htmlentities(trim($_POST['pseudo']));
@@ -29,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST'){
     }
    
     if (count($erreurs) < 1){
-        $hash = password_hash($mdp, PASSWORD_DEFAULT);
+        $hash = password_hash($mdp, PASSWORD_BCRYPT);
         $recup = $dbb->prepare('SELECT * FROM users WHERE username=? OR email=?');
         $recup->execute(array($name, $email));
         if ($recup->rowCount() > 0) {

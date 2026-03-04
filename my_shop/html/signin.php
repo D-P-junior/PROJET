@@ -1,12 +1,14 @@
 <?php
 session_start();
-try{
+require('data.php');
+$dbb = DNS::getInstance();
+/*try{
         $dbb = new PDO('mysql:host=localhost;dbname=my_shop', 'root', 'root');
         $dbb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     } catch (PDOException $e){
         echo $e->getMessage();
-    }
+    }*/
 if ($_SERVER['REQUEST_METHOD'] ==='POST'){
     $email = htmlentities(trim($_POST['email']));
     $mdp = $_POST['mdp'];
