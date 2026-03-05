@@ -319,7 +319,9 @@ nav a:hover {
   text-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
-.category-info a {
+.category-info a {.category-card {
+    height: 250px;
+  }
   font-size: 0.85rem;
   color: #ffffff;
   text-shadow: 0 2px 6px rgba(0,0,0,0.4);
@@ -561,6 +563,21 @@ nav a:hover {
 
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+
+  .products-grid{
+    display: grid;
+    grid-template-columns: repeat(4, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .products-grids{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
 }
 

@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST'){
     if ($user && password_verify($mdp, $user['password'])) {
         $_SESSION['pseudo'] = $user['username'];
         $_SESSION['id'] = $user['id'];
-        echo "ouiiiiii";
+        header('location: index.php');
+        exit;
     } else {
         $id = "Identifiant incorrecte";
     }

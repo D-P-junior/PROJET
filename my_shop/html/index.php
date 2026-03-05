@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -16,11 +20,11 @@
         
 
         <nav>
-        <a href="#">Accueil</a>
-        <a href="#">Boutique</a>
-        <a href="#">Nouveautés</a>
-        <a href="#">Soldes</a>
-        <a href="#">À propos</a>
+          <a href="#">Accueil</a>
+          <a href="#boutique">Boutique</a>
+          <a href="#new">Nouveautés</a>
+          <a href="#">Soldes</a>
+          <a href="#footer">À propos</a>
         </nav>
 
         <div class="header-icons">
@@ -33,23 +37,29 @@
         <div class="account">
             <i class="fa fa-user"></i>
             <div class="dropdown">
-            <a href="signin.php">Connexion</a>
-            <a href="signup.php">Inscription</a>
+              <?php if ($_SESSION['pseudo']): ?>
+              <a href="deco.php">Deconnexion</a>
+              <a href="#">Page Admin</a>
+              <?php else:?>
+              <a href="signin.php">Connexion</a>
+              <a href="signup.php">Inscription</a>
+              <?php endif; ?>
+            
             </div>
         </div>
 
         <i class="fa fa-shopping-bag"></i>
-        </div>
+        </div> 
 
         <div class="hamburger">&#9776;</div>
         
 
         <nav class="nav">
-        <a href="#">Accueil</a>
-        <a href="#">Boutique</a>
-        <a href="#">Nouveautés</a>
-        <a href="#">Soldes</a>
-        <a href="#">À propos</a>
+          <a href="#">Accueil</a>
+          <a href="#boutique">Boutique</a>
+          <a href="#new">Nouveautés</a>
+          <a href="#">Soldes</a>
+          <a href="#footer">À propos</a>
         </nav>
     
   </header>
@@ -107,7 +117,7 @@
   </div>
 </section>
 
-<section class="products">
+<section class="products" id="boutique">
   <div class="products-header">
     <h2>Produits Vedettes</h2>
     <div class="products-filter">
@@ -194,7 +204,7 @@
 </section>
 
 
-<section class="categories">
+<section class="categories" id="new">
   <h2>Nouveauté</h2>
 
   <div class="products-grids">
@@ -255,7 +265,7 @@
 </section>
 
 
-<section class="newsletter">
+<section class="newsletter" id="footer">
   <div class="newsletter-inner">
     <h2>Restez Connecté</h2>
     <p>Recevez nos dernières offres et nouveautés directement dans votre boîte mail.</p>

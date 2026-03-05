@@ -46,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST'){
 
             $_SESSION['pseudo'] = $user['username'];
             $_SESSION['id'] = $user['id'];
+            header('location: index.php');
+            exit;
 
         }   
     }
@@ -64,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST'){
     <section class="signup">
         <div class="left">
             <h1><span>I</span>nscription</h1>
-            <img src="../image/images.jpeg" alt="signup">
+            <img src="../image/images.png" alt="signup">
         </div>
 
         <div class="right">
