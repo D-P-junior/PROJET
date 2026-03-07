@@ -7,7 +7,7 @@ class DNS {
         if (self::$instance === null){
             try{
                 self::$instance = new PDO(
-                    'mysql:host=localhost;dbname=my_shop', 'root', 'root',
+                    'mysql:host=localhost;dbname=my_shop', 'root', '',
                     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
             } catch (PDOException $e){
